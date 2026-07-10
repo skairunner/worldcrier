@@ -1,5 +1,5 @@
 use crate::data::{RSS_SUFFIX, WatchTarget};
-use crate::db::{get_last_run_date, upsert_msgs};
+use crate::db::{get_last_run_date, update_run_date, upsert_msgs};
 use crate::dbtypes::RssMsg;
 use crate::rsstypes::Rss;
 use crate::sqliteacquire::SqliteAcquire;
@@ -13,7 +13,7 @@ use reqwest;
 const HOUR_S: i64 = 3600;
 
 /// The duration between scanning a given RSS feed
-static POLL_INTERVAL: Duration = Duration::new(HOUR_S, 0).unwrap();
+static POLL_INTERVAL: Duration = Duration::new(HOUR_S * 12, 0).unwrap();
 
 pub fn get_client() -> reqwest::Result<reqwest::Client> {
     let mut headers = reqwest::header::HeaderMap::new();
@@ -71,6 +71,7 @@ pub async fn poll_rss_if_needed<'a, A: SqliteAcquire<'a>>(
     log::debug!("Fetching");
     let items = poll_rss_feed(&format!("{}{}", info.url, RSS_SUFFIX)).await?;
     upsert_msgs(items, &mut *conn).await?;
+    update_run_date(&mut *conn).await?;
 
     log::debug!("OK");
     Ok(RssPoll::DidPoll)
