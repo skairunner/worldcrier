@@ -3312,6 +3312,7 @@ dependencies = [
  "anyhow",
  "bytes",
  "chrono",
+ "dotenvy",
  "log",
  "quick-xml",
  "reqwest 0.13.4",

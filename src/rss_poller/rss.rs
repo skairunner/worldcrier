@@ -1,19 +1,15 @@
 use crate::data::{RSS_SUFFIX, WatchTarget};
 use crate::db::{get_last_run_date, update_run_date, upsert_msgs};
 use crate::dbtypes::RssMsg;
-use crate::rsstypes::Rss;
+use crate::rss_poller::constants::POLL_INTERVAL;
+use crate::rss_poller::rsstypes::Rss;
 use crate::sqliteacquire::SqliteAcquire;
 use bytes::Buf;
-use chrono::Duration;
-use chrono::prelude::{FixedOffset, Utc};
+
+use chrono::prelude::Utc;
 use quick_xml::de::from_reader;
 use quick_xml::encoding::DecodingReader;
 use reqwest;
-
-const HOUR_S: i64 = 3600;
-
-/// The duration between scanning a given RSS feed
-static POLL_INTERVAL: Duration = Duration::new(HOUR_S * 12, 0).unwrap();
 
 pub fn get_client() -> reqwest::Result<reqwest::Client> {
     let mut headers = reqwest::header::HeaderMap::new();
