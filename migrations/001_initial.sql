@@ -1,10 +1,11 @@
 CREATE TABLE rss_msg (
-    title TEXT,
-    description TEXT,
-    link TEXT,
-    guid TEXT,
-    pub_date TEXT,
-    sent INTEGER
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    link TEXT NOT NULL,
+    guid TEXT NOT NULL,
+    pub_date TEXT NOT NULL,
+    image_url TEXT NOT NULL DEFAULT '',
+    sent INTEGER NOT NULL DEFAULT 0
 );
 CREATE UNIQUE INDEX idx_rss_msg_guid ON rss_msg (guid);
 CREATE INDEX idx_rss_msg_sent ON rss_msg (sent);

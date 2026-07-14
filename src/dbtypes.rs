@@ -1,4 +1,8 @@
 use chrono::prelude::{DateTime, FixedOffset};
+use sqlx::{
+    prelude::{FromRow, Row},
+    sqlite::SqliteRow,
+};
 
 use crate::rss_poller::rsstypes;
 
@@ -10,6 +14,7 @@ pub struct RssMsg {
     pub guid: String,
     pub pub_date_raw: String,
     pub pub_date: Option<DateTime<FixedOffset>>,
+    pub image_url: String,
 }
 
 impl RssMsg {
@@ -20,6 +25,28 @@ impl RssMsg {
         } else {
             self.pub_date_raw.clone()
         }
+    }
+}
+
+impl FromRow<'_, SqliteRow> for RssMsg {
+    fn from_row(row: &'_ SqliteRow) -> sqlx::Result<Self> {
+        let title = row.try_get("title")?;
+        let description = row.try_get("description")?;
+        let link = row.try_get("link")?;
+        let guid = row.try_get("guid")?;
+        let pub_date_raw: String = row.try_get("pub_date")?;
+        let pub_date = DateTime::parse_from_rfc3339(&pub_date_raw).ok();
+        let image_url = row.try_get("image_url")?;
+
+        Ok(Self {
+            title,
+            description,
+            link,
+            guid,
+            pub_date_raw,
+            pub_date,
+            image_url,
+        })
     }
 }
 
@@ -34,6 +61,13 @@ impl From<rsstypes::Item> for RssMsg {
             guid: value.guid,
             pub_date_raw: value.pub_date,
             pub_date: pub_date_parsed,
+            image_url: String::new(),
         }
     }
+}
+
+#[derive(FromRow)]
+pub struct TargetChannel {
+    pub guild_id: u64,
+    pub channel_id: u64,
 }

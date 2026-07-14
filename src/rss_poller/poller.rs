@@ -1,4 +1,5 @@
-use sqlx::{SqlitePool, migrate::Migrator};
+use sqlx::SqlitePool;
+use tracing::instrument;
 
 use crate::{
     data::WatchTarget,
@@ -10,13 +11,15 @@ use crate::{
 
 use super::rss::RssPoll;
 
-pub struct PollEntry {
+#[derive(Debug, Clone)]
+pub struct PollTarget {
     pub target: &'static WatchTarget,
     pub db: SqlitePool,
 }
 
 /// Infinite task to poll for rss periodically.
-pub async fn do_poll_rss(entries: Vec<PollEntry>) -> anyhow::Result<()> {
+#[instrument]
+pub async fn do_poll_rss(entries: Vec<PollTarget>) -> anyhow::Result<()> {
     loop {
         for entry in entries.iter() {
             let mut tx = entry.db.begin().await?;

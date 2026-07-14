@@ -1,3 +1,4 @@
 /target
 dbs/*
 !dbs/.gitkeep
+.env

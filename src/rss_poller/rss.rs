@@ -3,13 +3,13 @@ use crate::db::{get_last_run_date, update_run_date, upsert_msgs};
 use crate::dbtypes::RssMsg;
 use crate::rss_poller::constants::POLL_INTERVAL;
 use crate::rss_poller::rsstypes::Rss;
-use crate::sqliteacquire::SqliteAcquire;
 use bytes::Buf;
 
 use chrono::prelude::Utc;
 use quick_xml::de::from_reader;
 use quick_xml::encoding::DecodingReader;
 use reqwest;
+use sqlx::SqliteConnection;
 
 pub fn get_client() -> reqwest::Result<reqwest::Client> {
     let mut headers = reqwest::header::HeaderMap::new();
@@ -51,24 +51,23 @@ pub enum RssPoll {
 }
 
 /// Fetch the last scan date and poll if needed.
-pub async fn poll_rss_if_needed<'a, A: SqliteAcquire<'a>>(
+pub async fn poll_rss_if_needed(
     info: &WatchTarget,
-    conn: A,
+    conn: &mut SqliteConnection,
 ) -> anyhow::Result<RssPoll> {
-    log::debug!("Fetching date");
-    let mut conn = conn.acquire().await?;
+    tracing::debug!("Fetching date");
     let date = get_last_run_date(&mut *conn).await?;
-    log::debug!("Date: {date}");
+    tracing::debug!("Date: {date}");
     if Utc::now().fixed_offset() - date < POLL_INTERVAL {
-        log::debug!("Skipping.");
+        tracing::debug!("Skipping.");
         return Ok(RssPoll::DidNotPoll);
     }
 
-    log::debug!("Fetching");
+    tracing::debug!("Fetching");
     let items = poll_rss_feed(&format!("{}{}", info.url, RSS_SUFFIX)).await?;
     upsert_msgs(items, &mut *conn).await?;
     update_run_date(&mut *conn).await?;
 
-    log::debug!("OK");
+    tracing::debug!("OK");
     Ok(RssPoll::DidPoll)
 }

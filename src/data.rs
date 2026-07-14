@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct WatchTarget {
     pub name: &'static str,
     pub author: &'static str,
