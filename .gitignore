@@ -2,3 +2,4 @@
 dbs/*
 !dbs/.gitkeep
 .env
+obscura*

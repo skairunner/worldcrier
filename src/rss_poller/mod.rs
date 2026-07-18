@@ -1,5 +1,6 @@
 mod constants;
 pub mod poller;
+pub mod reqwest_client;
 pub mod rss;
 pub mod rsstypes;
 

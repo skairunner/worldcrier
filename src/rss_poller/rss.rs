@@ -2,27 +2,14 @@ use crate::data::{RSS_SUFFIX, WatchTarget};
 use crate::db::{get_last_run_date, update_run_date, upsert_msgs};
 use crate::dbtypes::RssMsg;
 use crate::rss_poller::constants::POLL_INTERVAL;
+use crate::rss_poller::reqwest_client::get_client;
 use crate::rss_poller::rsstypes::Rss;
 use bytes::Buf;
 
 use chrono::prelude::Utc;
 use quick_xml::de::from_reader;
 use quick_xml::encoding::DecodingReader;
-use reqwest;
 use sqlx::SqliteConnection;
-
-pub fn get_client() -> reqwest::Result<reqwest::Client> {
-    let mut headers = reqwest::header::HeaderMap::new();
-    headers.insert("x-clacks-overhead", "GNU Gorkam Worka".parse().unwrap());
-    headers.insert(
-        "user-agent",
-        "worldcrier/1.0 reqwest 0.13.4 (contact: ki539@nyu.edu)"
-            .parse()
-            .unwrap(),
-    );
-
-    reqwest::Client::builder().default_headers(headers).build()
-}
 
 /// Poll the specified RSS feed.
 pub async fn poll_rss_feed(url: &str) -> anyhow::Result<Vec<RssMsg>> {

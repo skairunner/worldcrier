@@ -29,8 +29,8 @@ fn color_tuple_from_hex(hex: &'static str) -> (u8, u8, u8) {
 
 static LOOP_INTERVAL_STD: Duration = Duration::new(5 * 60, 0);
 static COLORS: [&str; 10] = [
-    "#012a4a", "#013a63", "#01497c", "#014f86", "#2a6f97", "#2c7da0", "#468faf", "#61a5c2",
-    "#89c2d9", "#a9d6e5",
+    "#001219", "#005f73", "#0a9396", "#94d2bd", "#e9d8a6", "#ee9b00", "#ca6702", "#bb3e03",
+    "#ae2012", "#9b2226",
 ];
 
 lazy_static! {
