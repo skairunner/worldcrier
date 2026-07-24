@@ -90,8 +90,8 @@ pub async fn send_updates(context: &Context, poll_targets: &[PollTarget]) -> any
     let uniform = Uniform::new(0, COLOR_TUPLES.len() - 1)?;
     loop {
         i += 1;
-        if i >= max_i {
-            i -= max_i;
+        while i >= max_i {
+            i = i.saturating_sub(max_i);
         }
         let mut conn = poll_targets[i].db.acquire().await?;
         let msg = match get_unsent_message(&mut conn).await? {
