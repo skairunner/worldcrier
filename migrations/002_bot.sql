@@ -8,3 +8,5 @@ CREATE UNIQUE INDEX idx_discord_channels_channel_id ON discord_channels (channel
 
 -- Always include the bottest channel
 INSERT INTO discord_channels(guild_id, channel_id) VALUES ('536182478780760065', '536192255900385280');
+-- Let's hardcode the solaris channel
+INSERT INTO discord_channels(guild_id, channel_id) VALUES ('930095252629495868', '1530294697292206121');
