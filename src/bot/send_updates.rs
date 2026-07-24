@@ -6,13 +6,13 @@ use rand::{
     prelude::{Distribution, StdRng},
 };
 use serenity::{
-    builder::{CreateEmbed, CreateEmbedAuthor, CreateMessage},
+    builder::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage},
     model::{
         Colour,
         channel::GuildChannel,
         id::{ChannelId, GuildId},
     },
-    prelude::{Context},
+    prelude::Context,
 };
 
 use crate::{
@@ -29,18 +29,8 @@ fn color_tuple_from_hex(hex: &'static str) -> (u8, u8, u8) {
 
 static LOOP_INTERVAL_STD: Duration = Duration::new(5 * 60, 0);
 static COLORS: [&str; 12] = [
-    "#fafafa",
-    "#00a2e8",
-    "#7092be",
-    "#99D9ea",
-    "#b5e61d",
-    "#ed1c24",
-    "#ff7f27",
-    "#ffc90e",
-    "#ffaec9",
-    "#be82be",
-    "#523462",
-    "#211d32",
+    "#fafafa", "#00a2e8", "#7092be", "#99D9ea", "#b5e61d", "#ed1c24", "#ff7f27", "#ffc90e",
+    "#ffaec9", "#be82be", "#523462", "#211d32",
 ];
 
 lazy_static! {
@@ -119,13 +109,10 @@ pub async fn send_updates(context: &Context, poll_targets: &[PollTarget]) -> any
         );
         let tuple = COLOR_TUPLES[uniform.sample(&mut rng)];
         let embed = CreateEmbed::new()
-            .author(
-                CreateEmbedAuthor::new(poll_targets[i].target.author)
-                    .url(poll_targets[i].target.url),
-            )
             .title(msg.title)
-            .url(msg.link)
-            .description(msg.description)
+            .url(&msg.link)
+            .description(format!("{}\n\n{}", msg.description, msg.link))
+            .footer(CreateEmbedFooter::new(poll_targets[i].target.name))
             .color(Colour::from_rgb(tuple.0, tuple.1, tuple.2));
 
         let targets = get_discord_channels(&mut conn).await?;

@@ -7,7 +7,9 @@ use std::{
 use tracing::instrument;
 
 use crate::{
-    bot::{error::BotError, send_updates::send_updates}, db::add_discord_channel, rss_poller::poller::PollTarget,
+    bot::{error::BotError, send_updates::send_updates},
+    db::add_discord_channel,
+    rss_poller::poller::PollTarget,
 };
 
 #[derive(Debug)]
@@ -24,7 +26,9 @@ fn _check_parameter(param: Option<&str>, name: &str) -> Result<u64, String> {
     } else {
         return Err(format!("No {name} found"));
     };
-    param.parse::<u64>().map_err(|_e| format!("The {name} was not a valid ID"))
+    param
+        .parse::<u64>()
+        .map_err(|_e| format!("The {name} was not a valid ID"))
 }
 
 #[poise::command(slash_command)]
@@ -35,7 +39,13 @@ async fn register(
     #[description = "Channel to register"] channel_link: String,
 ) -> Result<(), BotError> {
     // First, check if the target exists.
-    let target = ctx.data().poll_targets.iter().filter(|target| target.matches(&author_name, &world_name)).next().cloned();
+    let target = ctx
+        .data()
+        .poll_targets
+        .iter()
+        .filter(|target| target.matches(&author_name, &world_name))
+        .next()
+        .cloned();
     let target = if let Some(target) = target {
         target
     } else {
@@ -56,7 +66,8 @@ async fn register(
             ctx.send(CreateReply {
                 content: Some(msg),
                 ..Default::default()
-            }).await?;
+            })
+            .await?;
             return Ok(());
         }
     };
@@ -66,7 +77,8 @@ async fn register(
             ctx.send(CreateReply {
                 content: Some(msg),
                 ..Default::default()
-            }).await?;
+            })
+            .await?;
             return Ok(());
         }
     };
@@ -76,20 +88,23 @@ async fn register(
         channel
     } else {
         ctx.send(CreateReply {
-            content: Some("This command can only be invoked from a server, not in DMs.".to_string()),
+            content: Some(
+                "This command can only be invoked from a server, not in DMs.".to_string(),
+            ),
             ..Default::default()
-        }).await?;
+        })
+        .await?;
         return Ok(());
     };
     if channel.guild_id.get() != guild_id {
         ctx.send(CreateReply {
             content: Some("The target channel does not exist in the guild".to_string()),
             ..Default::default()
-        }).await?;
+        })
+        .await?;
         return Ok(());
     }
     // Next, need to check that the provided channel exists in the server
-
 
     Ok(())
 }

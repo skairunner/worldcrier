@@ -71,13 +71,19 @@ pub struct TargetChannel {
     pub channel_id: u64,
 }
 
-
 impl FromRow<'_, SqliteRow> for TargetChannel {
     fn from_row(row: &'_ SqliteRow) -> Result<Self, sqlx::Error> {
-        let guild_id = row.try_get::<String, _>("guild_id")?.parse::<u64>().map_err(|e| sqlx::Error::Decode(Box::new(e)))?;
-        let channel_id = row.try_get::<String, _>("channel_id")?.parse::<u64>().map_err(|e| sqlx::Error::Decode(Box::new(e)))?;
+        let guild_id = row
+            .try_get::<String, _>("guild_id")?
+            .parse::<u64>()
+            .map_err(|e| sqlx::Error::Decode(Box::new(e)))?;
+        let channel_id = row
+            .try_get::<String, _>("channel_id")?
+            .parse::<u64>()
+            .map_err(|e| sqlx::Error::Decode(Box::new(e)))?;
         Ok(Self {
-            guild_id, channel_id
+            guild_id,
+            channel_id,
         })
     }
 }
