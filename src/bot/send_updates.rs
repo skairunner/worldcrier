@@ -8,7 +8,7 @@ use rand::{
 use serenity::{
     builder::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage},
     model::{
-        Colour,
+        Colour, Timestamp,
         channel::GuildChannel,
         id::{ChannelId, GuildId},
     },
@@ -108,12 +108,18 @@ pub async fn send_updates(context: &Context, poll_targets: &[PollTarget]) -> any
             poll_targets[i].target.name
         );
         let tuple = COLOR_TUPLES[uniform.sample(&mut rng)];
-        let embed = CreateEmbed::new()
+        let mut embed = CreateEmbed::new()
             .title(msg.title)
             .url(&msg.link)
-            .description(format!("{}\n\n{}", msg.description, msg.link))
+            .description(format!("{}\n-—✦—-\n{}", msg.description, msg.link))
             .footer(CreateEmbedFooter::new(poll_targets[i].target.name))
             .color(Colour::from_rgb(tuple.0, tuple.1, tuple.2));
+        if let Some(pub_date) = &msg.pub_date {
+            let timestamp = Timestamp::from_unix_timestamp(pub_date.timestamp());
+            if let Ok(timestamp) = timestamp {
+                embed = embed.timestamp(timestamp);
+            }
+        }
 
         let targets = get_discord_channels(&mut conn).await?;
 
