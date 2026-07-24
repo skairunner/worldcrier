@@ -12,7 +12,7 @@ use serenity::{
         channel::GuildChannel,
         id::{ChannelId, GuildId},
     },
-    prelude::{CacheHttp, Context},
+    prelude::{Context},
 };
 
 use crate::{

@@ -108,3 +108,20 @@ pub async fn get_discord_channels(conn: &mut SqliteConnection) -> sqlx::Result<V
     .fetch_all(&mut *conn)
     .await
 }
+
+/// Add a new guild and channel to send to.
+pub async fn add_discord_channel(
+    target: &TargetChannel,
+    conn: &mut SqliteConnection,
+) -> sqlx::Result<()> {
+    sqlx::query("\
+    INSERT INTO discord_channels (guild_id, channel_id)
+    VALUES (?, ?);
+"
+    )
+    .bind(&target.guild_id.to_string())
+    .bind(&target.channel_id.to_string())
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
+}

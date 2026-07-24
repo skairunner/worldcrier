@@ -17,6 +17,13 @@ pub struct PollTarget {
     pub db: SqlitePool,
 }
 
+impl PollTarget {
+    /// Whether the author and world name matches this poll target
+    pub fn matches(&self, author: &str, world_name: &str) -> bool {
+        return author == self.target.author && world_name == self.target.name;
+    }
+}
+
 /// Infinite task to poll for rss periodically.
 #[instrument]
 pub async fn do_poll_rss(entries: Vec<PollTarget>) -> anyhow::Result<()> {
