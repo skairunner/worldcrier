@@ -28,9 +28,19 @@ fn color_tuple_from_hex(hex: &'static str) -> (u8, u8, u8) {
 }
 
 static LOOP_INTERVAL_STD: Duration = Duration::new(5 * 60, 0);
-static COLORS: [&str; 10] = [
-    "#001219", "#005f73", "#0a9396", "#94d2bd", "#e9d8a6", "#ee9b00", "#ca6702", "#bb3e03",
-    "#ae2012", "#9b2226",
+static COLORS: [&str; 12] = [
+    "#fafafa",
+    "#00a2e8",
+    "#7092be",
+    "#99D9ea",
+    "#b5e61d",
+    "#ed1c24",
+    "#ff7f27",
+    "#ffc90e",
+    "#ffaec9",
+    "#be82be",
+    "#523462",
+    "#211d32",
 ];
 
 lazy_static! {
@@ -87,7 +97,7 @@ pub async fn send_updates(context: &Context, poll_targets: &[PollTarget]) -> any
     let max_i = poll_targets.len();
     let mut i = 0;
     let mut rng = rand::make_rng::<StdRng>();
-    let uniform = Uniform::new(0, 9)?;
+    let uniform = Uniform::new(0, COLOR_TUPLES.len() - 1)?;
     loop {
         i += 1;
         if i >= max_i {
