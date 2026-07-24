@@ -9,7 +9,7 @@ use serenity::{
     builder::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage},
     model::{
         Colour, Timestamp,
-        channel::GuildChannel,
+        channel::{ChannelType, GuildChannel},
         id::{ChannelId, GuildId},
     },
     prelude::Context,
@@ -138,12 +138,21 @@ pub async fn send_updates(context: &Context, poll_targets: &[PollTarget]) -> any
                     }
                 },
             };
-            if let Err(e) = channel
+            let message = match channel
                 .send_message(&context, CreateMessage::new().add_embed(embed.clone()))
                 .await
             {
-                tracing::error!("Problem while sending message: {e:?}");
-                continue;
+                Err(e) => {
+                    tracing::error!("Problem while sending message: {e:?}");
+                    continue;
+                }
+                Ok(m) => m,
+            };
+            if matches!(channel.kind, ChannelType::News) {
+                if let Err(e) = message.crosspost(context).await {
+                    tracing::error!("Problem while crossposting: {e:?}");
+                    continue;
+                }
             }
         }
         set_message_sent(&msg.guid, &mut conn).await?;
